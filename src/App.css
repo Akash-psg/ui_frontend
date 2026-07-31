@@ -1,4 +1,17 @@
+/* Global box-sizing reset — ensures padding/borders never throw off
+   width calculations, which is essential for reliable responsive
+   layouts (prevents gaps/overflow caused by auto-width + margin
+   combinations not accounting for box model correctly). */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 /* General Styles */
+/* NOTE: stray "npm" was accidentally left in front of the body
+   selector below, which broke this rule (invalid selector).
+   Commented out the bad line and restored the correct one —
+   nothing removed, just fixed. */
+/* npm body { */
 body {
   font-family: 'Roboto', sans-serif;
   background-color: #f5f5f5;
@@ -39,11 +52,12 @@ h1, h2 {
 header {
   background-color: #61ffd0;
   color: white;
-  padding: 10px 20px;  /* Reduced padding */
+  padding: 10px 20px;
   text-align: center;
-  font-size: 1.2rem;  /* Reduced font size */
+  font-size: 1.2rem;
   font-weight: bold;
   box-shadow: 0 4px 6px rgba(150, 208, 226, 0.1);
+  margin-left: 200px; /* was 220px — now matches .sidebar's actual width, no gap */
 }
 
 h1 {
@@ -322,4 +336,407 @@ main {
   font-size: 14px;
   margin-top: 10px;
   font-weight: bold;
+}
+
+/* Login / Register Styles */
+.login-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+}
+
+.login-card {
+  background: white;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.login-card div {
+  text-align: left;
+  margin-bottom: 15px;
+}
+
+.login-card label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.login-card input,
+.login-card select {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.login-switch {
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.login-switch a {
+  color: #007bff;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.login-switch a:hover {
+  text-decoration: underline;
+}
+
+/* ==========================================================
+   RESPONSIVE STYLES
+   Breakpoint: 768px (tablets and phones)
+   Strategy: sidebar STAYS fixed on the left, just narrower,
+   with smaller text/padding. Header and main shrink their
+   left offset to match the narrower sidebar width. Tables
+   scroll horizontally instead of overflowing the screen.
+   ========================================================== */
+@media (max-width: 768px) {
+
+  body {
+    border-width: 3px;
+    overflow-x: hidden;
+    width: 100%;
+  }
+
+  /* Sidebar stays fixed on the left, just narrower */
+  .sidebar {
+    width: 110px;
+    padding-top: 15px;
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+
+  .sidebar li {
+    margin-bottom: 10px;
+  }
+
+  .sidebar button {
+    padding: 10px 4px;
+    font-size: 11.5px;
+    line-height: 1.3;
+    white-space: normal; /* allow labels like "Generate Report" to wrap to 2 lines */
+    word-break: break-word;
+  }
+
+  /* Header shrinks its left offset to match the narrower sidebar.
+     Width is explicitly calculated (not left to auto) so it fills
+     the remaining space next to the sidebar with no gap on the right. */
+  header {
+    margin-left: 110px;
+    width: calc(100% - 110px);
+    font-size: 0.95rem;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  header h1 {
+    font-size: 0.95rem;
+  }
+
+  header > div {
+    position: static !important;
+    transform: none !important;
+    justify-content: center;
+  }
+
+  /* Main content: same explicit width fix as header above */
+  main {
+    margin-left: 110px;
+    width: calc(100% - 110px);
+    padding: 12px;
+  }
+
+  /* Login card fits smaller screens with side breathing room */
+  .login-card {
+    padding: 24px;
+    max-width: 90%;
+  }
+
+  /* Grid-based forms stack into a single column.
+     Overrides the desktop-only ".grid-container div { width: 45%; }"
+     rule, which left a blank gap on screens with only one field
+     (e.g. BoxStatus' single "Megbox IP" field). */
+  .grid-container {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .grid-container div {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .grid-container label {
+    width: auto;
+  }
+
+  /* Camera IP table/box on BoxStatus should also fill the row
+     instead of leaving space next to it, and must not overflow
+     past the container (the empty "remove icon" column was
+     pushing the table wider than its parent on narrow screens) */
+  .camera-table,
+  .camera-table table {
+    width: 100%;
+    box-sizing: border-box;
+    table-layout: fixed;
+    display: table;
+    overflow-x: visible;
+  }
+
+  .camera-table td:first-child {
+    width: 85%;
+  }
+
+  .camera-table td:last-child {
+    width: 15%;
+    text-align: center;
+    border: none;
+    padding: 0;
+  }
+
+  .camera-table td:first-child {
+    border: none;
+    padding: 0;
+  }
+
+  .camera-table input[type="text"] {
+    width: 100%;
+    max-width: 100%;
+  }
+
+   .camera-table td:first-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.camera-table td:first-child label {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.camera-table td:first-child input[type="text"] {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+}
+
+  /* Tables scroll horizontally instead of squeezing/overflowing.
+     NOTE: a stray "npm" was accidentally left in this selector
+     list before, which broke the rule. Commented the bad line
+     out below and restored the correct selector — nothing removed. */
+  /* .scrollable-table,npm */
+  .table-container,
+  .scrollable-table,
+  .grouped-table {
+    overflow-x: auto;
+  }
+
+  table {
+    min-width: 500px;
+  }
+
+  /* Pagination and search stack vertically on narrow screens */
+  .pagination-and-search,
+  .top-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .search-box {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Buttons take full width for easier tapping */
+  .action-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .action-buttons button {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  button {
+    min-width: 0;
+    width: 100%;
+  }
+
+  button.centered {
+    width: auto;
+  }
+
+  input[type="text"], .search-section input {
+    max-width: 100%;
+  }
+
+  /* Footer no longer fixed on mobile so it doesn't cover content */
+  footer {
+    position: static;
+  }
+}
+
+/* Extra-small phones */
+@media (max-width: 420px) {
+  header h1 {
+    font-size: 1rem;
+  }
+
+  .login-card {
+    padding: 16px;
+  }
+
+}
+
+/* ==========================================================
+   SIDEBAR TOGGLE (hamburger show/hide)
+   Layered on top of the existing .sidebar / header / main
+   rules above. Only the CLOSED state overrides margin-left
+   to 0 — the OPEN state deliberately sets no margin-left so
+   it falls through to whatever the existing desktop (220px)
+   or the @media(max-width:768px) mobile (110px) rule already
+   defines, keeping both breakpoints correct automatically.
+   ========================================================== */
+
+.sidebar {
+  transition: transform 0.3s ease;
+}
+
+.sidebar-open {
+  transform: translateX(0);
+}
+
+.sidebar-closed {
+  transform: translateX(-100%);
+}
+
+header {
+  transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+main {
+  transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+.header-sidebar-closed {
+  margin-left: 0;
+  width: 100%;
+}
+
+.main-sidebar-closed {
+  margin-left: 0;
+  width: 100%;
+}
+
+/* ==========================================================
+   TOASTIFY THEME OVERRIDE
+   Placed here (not Dashboard.css) so it's global — applies on
+   the login/register screen too, since Login.js only imports
+   Login.css, never Dashboard.css.
+   ========================================================== */
+
+.Toastify__toast {
+  font-family: 'Inter', sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  border-radius: 14px;
+  box-shadow: 0 14px 30px rgba(74,58,209,0.18);
+}
+
+/* Higher-specificity selectors + !important are required to beat
+   Toastify's own .Toastify__toast-theme--colored.Toastify__toast--success/error
+   rules (which come from theme="colored" on <ToastContainer />). */
+.Toastify__toast--success,
+.Toastify__toast-theme--colored.Toastify__toast--success {
+  background: linear-gradient(135deg, #17B99E, #20C6B5) !important;
+}
+.Toastify__toast--error,
+.Toastify__toast-theme--colored.Toastify__toast--error {
+  background: linear-gradient(135deg, #FF6F91, #E23F63) !important;
+}
+
+.Toastify__toast-body { padding: 2px 4px; }
+.Toastify__progress-bar { opacity: 0.55; }
+
+/* The app's global `button { padding: 12px 24px; min-width: 160px; ... }` rule
+   (further up this file) matches Toastify's close button too, blowing it up into
+   an oversized pill that overlaps the toast instead of sitting in the corner.
+   Reset it back to Toastify's intended small "x" in the corner. */
+.Toastify__close-button {
+  padding: 0 !important;
+  margin: 0 !important;
+  min-width: 0 !important;
+  width: auto !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #fff !important;
+  opacity: 0.85;
+  align-self: flex-start;
+}
+.Toastify__close-button:hover {
+  background: transparent !important;
+  transform: none !important;
+  opacity: 1;
+}
+
+/* Login/Register screen is a fixed full-screen overlay at z-index 999999
+   (see .kp-auth in Login.css), which sits above Toastify's default
+   z-index (9999) and hides toasts. Push the toast container above
+   that overlay so it's visible on auth screens too. */
+.Toastify__toast-container {
+  z-index: 9999999 !important;
+}
+/* ---------- Loading spinner (reusable across the app) ---------- */
+@keyframes kp-spin {
+  to { transform: rotate(360deg); }
+}
+.kp-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 3px solid rgba(122, 84, 240, 0.15);
+  border-top-color: #8A5CF6;
+  border-radius: 50%;
+  animation: kp-spin 0.7s linear infinite;
+  vertical-align: middle;
+}
+.kp-spinner--lg {
+  width: 34px;
+  height: 34px;
+  border-width: 4px;
+}
+.kp-loading-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 28px 0;
+  color: #7A749B;
+  font-size: 13px;
+  font-weight: 600;
+}
+.kp-btn-loading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.kp-spinner--on-btn {
+  border-color: rgba(255,255,255,0.35);
+  border-top-color: #fff;
 }

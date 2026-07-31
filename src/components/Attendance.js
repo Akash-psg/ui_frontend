@@ -28,9 +28,28 @@ function Attendance({ tableData, setTableData }) {
     try {
       const response = await fetch(apiUrl);
       let data = await response.json();
-      setTableData(data);
+
+      // Defensive check: the API is expected to return a plain array.
+      // If it ever returns something else (e.g. a paginated wrapper like
+      // { content: [...] }, or an error object), fall back safely instead
+      // of crashing the whole page.
+      if (Array.isArray(data)) {
+        setTableData(data);
+      } else if (data && Array.isArray(data.content)) {
+        console.warn(
+          "Attendance API returned a paginated/wrapped response instead of a plain array. Using data.content."
+        );
+        setTableData(data.content);
+      } else {
+        console.error(
+          "Attendance API returned an unexpected response shape:",
+          data
+        );
+        setTableData([]);
+      }
     } catch (error) {
       console.error("Error fetching attendance data:", error);
+      setTableData([]);
     } finally {
       if (!isDemoApi) {
         setLoading(false);
@@ -67,9 +86,13 @@ function Attendance({ tableData, setTableData }) {
     setModalImage(null);
   };
 
+  // Guard against tableData ever being a non-array (e.g. on first render
+  // before a fetch completes, or if a parent passes a bad value as a prop)
+  const safeTableData = Array.isArray(tableData) ? tableData : [];
+
   // Calculate checked and unchecked count
-  const checkedCount = tableData.filter((item) => item.completed).length;
-  const uncheckedCount = tableData.length - checkedCount;
+  const checkedCount = safeTableData.filter((item) => item.completed).length;
+  const uncheckedCount = safeTableData.length - checkedCount;
 
   return (
     <>
@@ -77,7 +100,7 @@ function Attendance({ tableData, setTableData }) {
       <div style={styles.countContainer}>
         <table>
           <tr>
-            <td>Total Records: {tableData.length}</td>
+            <td>Total Records: {safeTableData.length}</td>
             <td>✔️ Present: {checkedCount}</td>
             <td>❌ Absent: {uncheckedCount}</td>
           </tr>
@@ -98,8 +121,8 @@ function Attendance({ tableData, setTableData }) {
             </tr>
           </thead>
           <tbody>
-            {tableData.length > 0 ? (
-              tableData.map((item, index) => (
+            {safeTableData.length > 0 ? (
+              safeTableData.map((item, index) => (
                 <tr key={index}>
                   <td>{item.regno}</td>
                   <td>{item.name}</td>

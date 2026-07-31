@@ -1,58 +1,76 @@
 import React, { useEffect, useState } from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
-import Attendance from './components/Attendance';
-import Upload from './components/Upload';
+import AssignCamera from './components/AssignCamera';
 import BoxStatus from './components/BoxStatus';
-import AddStudent from './components/AddStudent';
-import About from './components/About';
-import Contact from './components/Contact';
-import GenerateReport from './components/GenerateReport'; // Import the GenerateReport component
+import Registration from './components/Registration';
+import Students from './components/Students';
+import MegboxUpload from './components/MegboxUpload';
+import AttendanceReport from './components/AttendanceReport';
+import Login from './components/Login';
 
 function App() {
-  const [tableData, setTableData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [ipAddress, setIpAddress] = useState('');
-  const [roomNumber, setRoomNumber] = useState('');
-  const [statusData, setStatusData] = useState([]);
-  const [activeSection, setActiveSection] = useState('attendance');
-  const [studentName, setStudentName] = useState('');
-  const [regNo, setRegNo] = useState('');
-
-  const fetchData = () => {
-    fetch('http://localhost:8080/kpcamera/v1/attendance/getAttendance')
-      .then((response) => response.json())
-      .then((json) => setTableData(json))
-      .catch((error) => console.error('Error fetching data:', error));
-  };
-
-  const fetchIpStatusData = () => {
-    fetch('http://localhost:8080/kpcamera/v1/roomAndIp/getIpAndRoomDetails')
-      .then((response) => response.json())
-      .then((json) => setStatusData(json))
-      .catch((error) => console.error('Error fetching data:', error));
-  };
+  const [activeSection, setActiveSection] = useState('boxStatus');
+  const [user, setUser] = useState(null);
+  const [checkingSession, setCheckingSession] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
-    fetchData();
-    fetchIpStatusData();
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+    setCheckingSession(false);
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    setUser(null);
+  };
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen((prev) => !prev);
+  };
+
+  if (checkingSession) {
+    return null; // avoid flash of login page while checking localStorage
+  }
+
+  if (!user) {
+    return (
+      <>
+        <Login onLoginSuccess={(loggedInUser) => setUser(loggedInUser)} />
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          newestOnTop
+          theme="colored"
+        />
+      </>
+    );
+  }
 
   return (
     <div className="App">
-      <Header />
-      <Sidebar setActiveSection={setActiveSection} />
-      <main>
-        {activeSection === 'attendance' && <Attendance tableData={tableData} setTableData={setTableData} />}
-        {activeSection === 'upload' && <Upload isLoading={isLoading} handleUpload={() => setIsLoading(true)} />}
-        {activeSection === 'boxStatus' && <BoxStatus ipAddress={ipAddress} roomNumber={roomNumber} statusData={statusData} />}
-        {activeSection === 'addStudent' && <AddStudent />}
-        {activeSection === 'about' && <About />}
-        {activeSection === 'contact' && <Contact />}
-        {activeSection === 'generateReport' && <GenerateReport />} {/* Add GenerateReport section here */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        newestOnTop
+        theme="colored"
+      />
+      <Header user={user} onLogout={handleLogout} onToggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
+      <Sidebar setActiveSection={setActiveSection} isOpen={isSidebarOpen} user={user} />
+      <main className={isSidebarOpen ? '' : 'main-sidebar-closed'}>
+        {activeSection === 'assignCamera' && <AssignCamera />}
+        {activeSection === 'boxStatus' && <BoxStatus />}
+        {activeSection === 'registration' && <Registration />}
+        {activeSection === 'students' && <Students />}
+        {activeSection === 'megboxUpload' && <MegboxUpload />}
+        {activeSection === 'attendanceReport' && <AttendanceReport />}
       </main>
-
     </div>
   );
 }
