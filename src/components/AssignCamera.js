@@ -14,6 +14,16 @@ function AssignCamera() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [fieldErrors, setFieldErrors] = useState({ megboxIp: false, cameraIndexes: [] });
 
+  const getAuditHeaders = () => {
+  const stored = localStorage.getItem('user');
+  const user = stored ? JSON.parse(stored) : {};
+  return {
+    'X-User-Email': user.email || '',
+    'X-User-Name': user.name || '',
+    'X-User-Role': user.role || '',
+  };
+};
+
   const validateInputs = () => {
     if (!localIpAddress) {
       setError('Megbox IP is required.');
@@ -67,15 +77,16 @@ function AssignCamera() {
     };
 
     fetch(
-      `${process.env.REACT_APP_API_BASE_URL}/v1/megbox/assignCamerasToMegBox`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData),
-      }
-    )
+  `${process.env.REACT_APP_API_BASE_URL}/v1/megbox/assignCamerasToMegBox`,
+  {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuditHeaders(),
+    },
+    body: JSON.stringify(requestData),
+  }
+)
       .then((response) => response.json())
       .then((data) => {
         if (data && data.success) {

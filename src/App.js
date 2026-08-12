@@ -16,7 +16,7 @@ function App() {
   const [activeSection, setActiveSection] = useState('boxStatus');
   const [user, setUser] = useState(null);
   const [checkingSession, setCheckingSession] = useState(true);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -34,6 +34,17 @@ function App() {
   const toggleSidebar = () => {
     setIsSidebarOpen((prev) => !prev);
   };
+
+  const handleSelectSection = (section) => {
+    setActiveSection(section);
+    // Auto-close the sidebar on mobile after picking a section, since it's
+    // an overlay drawer there and blocks the page until dismissed. On
+    // desktop the sidebar is docked (not an overlay), so leave it open.
+    if (window.innerWidth <= 768) {
+      setIsSidebarOpen(false);
+    }
+  };
+
 
   if (checkingSession) {
     return null; // avoid flash of login page while checking localStorage
@@ -62,7 +73,11 @@ function App() {
         theme="colored"
       />
       <Header user={user} onLogout={handleLogout} onToggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
-      <Sidebar setActiveSection={setActiveSection} isOpen={isSidebarOpen} user={user} />
+      
+   <Sidebar setActiveSection={handleSelectSection} isOpen={isSidebarOpen} user={user} />
+      {isSidebarOpen && (
+        <div className="kp-sidebar-backdrop" onClick={toggleSidebar} />
+      )}
       <main className={isSidebarOpen ? '' : 'main-sidebar-closed'}>
         {activeSection === 'assignCamera' && <AssignCamera />}
         {activeSection === 'boxStatus' && <BoxStatus />}

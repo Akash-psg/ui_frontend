@@ -15,7 +15,7 @@ function Attendance({ tableData, setTableData }) {
   // Fetch data from API
   const fetchAttendanceData = async () => {
     const apiUrl =
-      "http://localhost:8080/kpcamera/v1/attendance/getAttendanceDemo";
+      "http://13.201.120.181:8080/kpcamera/v1/attendance/getAttendanceDemo";
 
     // Check if the API is a demo API
     const isDemoApi = apiUrl.includes("getAttendanceDemo");

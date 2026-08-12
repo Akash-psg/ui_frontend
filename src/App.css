@@ -21,8 +21,7 @@ body {
   flex-direction: column;
   height: 100%;
   overflow-y: auto;
-  border: 5px solid #4CAF50;
-  box-sizing: border-box;
+ box-sizing: border-box;
   border-radius: 10px;
 }
 
@@ -58,7 +57,12 @@ header {
   font-weight: bold;
   box-shadow: 0 4px 6px rgba(150, 208, 226, 0.1);
   margin-left: 200px; /* was 220px — now matches .sidebar's actual width, no gap */
+  position: relative; /* required so z-index below actually takes effect */
+  z-index: 2100;       /* stays above the sidebar (2000) so the hamburger
+                           button is always clickable, even when the sidebar
+                           drawer is open and overlapping it on mobile */
 }
+
 
 h1 {
   margin: 0;
@@ -408,11 +412,17 @@ main {
   }
 
   /* Sidebar stays fixed on the left, just narrower */
-  .sidebar {
-    width: 110px;
+    .sidebar {
+    width: 240px;
     padding-top: 15px;
-    padding-left: 6px;
-    padding-right: 6px;
+    padding-left: 14px;
+    padding-right: 14px;
+    z-index: 2000;
+    transform: translateX(-100%);
+  }
+
+  .sidebar.sidebar-open {
+    transform: translateX(0);
   }
 
   .sidebar li {
@@ -420,19 +430,17 @@ main {
   }
 
   .sidebar button {
-    padding: 10px 4px;
-    font-size: 11.5px;
+    padding: 10px 12px;
+    font-size: 13.5px;
     line-height: 1.3;
-    white-space: normal; /* allow labels like "Generate Report" to wrap to 2 lines */
-    word-break: break-word;
+    white-space: nowrap;
   }
 
-  /* Header shrinks its left offset to match the narrower sidebar.
-     Width is explicitly calculated (not left to auto) so it fills
-     the remaining space next to the sidebar with no gap on the right. */
+  /* Header and main no longer shift — sidebar overlays them now,
+     it doesn't push them. */
   header {
-    margin-left: 110px;
-    width: calc(100% - 110px);
+    margin-left: 0;
+    width: 100%;
     font-size: 0.95rem;
     padding: 10px 12px;
     display: flex;
@@ -450,10 +458,9 @@ main {
     justify-content: center;
   }
 
-  /* Main content: same explicit width fix as header above */
   main {
-    margin-left: 110px;
-    width: calc(100% - 110px);
+    margin-left: 0;
+    width: 100%;
     padding: 12px;
   }
 
@@ -616,20 +623,27 @@ main {
   transition: transform 0.3s ease;
 }
 
-.sidebar-open {
-  transform: translateX(0);
-}
-
-.sidebar-closed {
-  transform: translateX(-100%);
-}
-
 header {
   transition: margin-left 0.3s ease, width 0.3s ease;
 }
 
 main {
   transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+/* Sidebar hide/show and content full-width only apply on mobile.
+   On desktop, the sidebar always stays visible/docked and main
+   always keeps its normal margin-left — the toggle has no effect. */
+/* Sidebar hide/show now applies at ALL screen sizes, so the hamburger
+   toggle works on both mobile and desktop. Default open/closed state
+   is handled in App.js (open on desktop, closed on mobile) — this CSS
+   just reacts to whichever class is applied. */
+.sidebar-open {
+  transform: translateX(0);
+}
+
+.sidebar-closed {
+  transform: translateX(-100%);
 }
 
 .header-sidebar-closed {
@@ -640,6 +654,38 @@ main {
 .main-sidebar-closed {
   margin-left: 0;
   width: 100%;
+}
+
+/* Dimmed backdrop shown behind the sidebar when it's open on mobile.
+   Tapping it closes the drawer. Hidden entirely on desktop, since the
+   sidebar docks there instead of overlaying content. */
+.kp-sidebar-backdrop {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .kp-sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(36, 27, 78, 0.45);
+    z-index: 1500; /* above content, below sidebar (2000) and header (2100) */
+  }
+}
+
+
+.kp-sidebar-backdrop {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .kp-sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(36, 27, 78, 0.45);
+    z-index: 1500;
+  }
 }
 
 /* ==========================================================

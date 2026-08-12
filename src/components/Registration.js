@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { toast } from 'react-toastify';
-import { FaFileCsv, FaFileArchive, FaUserPlus } from 'react-icons/fa';
+import { FaFileCsv, FaFileArchive, FaUserPlus, FaDownload, FaTable } from 'react-icons/fa';
 import './Dashboard.css';
 
 function Registration() {
@@ -8,6 +8,7 @@ function Registration() {
   const [csvFile, setCsvFile] = useState(null);
   const [csvLoading, setCsvLoading] = useState(false);
   const [csvResult, setCsvResult] = useState(null);
+  const [showTemplate, setShowTemplate] = useState(false);
 
   // ---- Section B: ZIP photo upload ----
   const [zipFile, setZipFile] = useState(null);
@@ -51,6 +52,22 @@ function Registration() {
         toast.error(`An error occurred while uploading the CSV: ${error.message}`);
       })
       .finally(() => setCsvLoading(false));
+  };
+
+  // Purely a frontend convenience — builds a small sample CSV in-browser
+  // (matching the required "name,reg_no" header) and downloads it, so staff
+  // have a working template to start from instead of guessing the format.
+  const handleDownloadSampleCsv = () => {
+    const csvContent = 'name,reg_no\nAkash,101\nPriya,102\nAjay,103\n';
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'students_sample.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const handleZipUpload = () => {
@@ -186,6 +203,14 @@ function Registration() {
             ) : (
               'Upload CSV'
             )}
+          </button>
+
+          <button
+            type="button"
+            className="kp-btn-secondary"
+            onClick={() => setShowTemplate(true)}
+          >
+            <FaTable /> View Sample Format
           </button>
         </div>
 
@@ -358,6 +383,64 @@ function Registration() {
           </button>
         </div>
       </div>
+
+      {/* ---- CSV template modal (triggered by "View Sample Format") ---- */}
+      {showTemplate && (
+        <div className="kp-confirm-overlay" onClick={() => setShowTemplate(false)}>
+          <div
+            className="kp-confirm-card kp-template-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="kp-confirm-title">Expected CSV format</p>
+
+             <div className="kp-csv-template-table-wrap">
+              <table className="kp-csv-template-table">
+                <thead>
+                  <tr>
+                    <th>name</th>
+                    <th>reg_no</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Akash</td>
+                    <td>101</td>
+                  </tr>
+                  <tr>
+                    <td>Priya</td>
+                    <td>102</td>
+                  </tr>
+                  <tr>
+                    <td>Ajay</td>
+                    <td>103</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p className="kp-csv-template-note">
+              Column headers must be exactly <code>name</code> and <code>reg_no</code>. One student per row.
+            </p>
+
+            <div className="kp-confirm-actions">
+              <button
+                type="button"
+                className="kp-btn-secondary"
+                onClick={() => setShowTemplate(false)}
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                className="kp-btn-primary"
+                onClick={handleDownloadSampleCsv}
+              >
+                <FaDownload /> Download sample
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

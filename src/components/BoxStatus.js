@@ -31,6 +31,16 @@ function BoxStatus({ refreshTrigger, showActions = false, showStats = true }) {
   const [pendingKey, setPendingKey] = useState(null);
   const [confirmState, setConfirmState] = useState(null); // { message, onConfirm } | null
 
+const getAuditHeaders = () => {
+  const stored = localStorage.getItem('user');
+  const user = stored ? JSON.parse(stored) : {};
+  return {
+    'X-User-Email': user.email || '',
+    'X-User-Name': user.name || '',
+    'X-User-Role': user.role || '',
+  };
+};
+
   useEffect(() => {
     fetchMegboxStatus(currentPage);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -157,10 +167,10 @@ function BoxStatus({ refreshTrigger, showActions = false, showStats = true }) {
     setPendingKey(rowKey);
     const url = `${process.env.REACT_APP_API_BASE_URL}/v1/megbox/camera?megboxIp=${encodeURIComponent(item.megboxIp)}&cameraIp=${encodeURIComponent(camera.cameraIp)}`;
     fetch(url, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ newCameraIp: trimmedIp }),
-    })
+  method: 'PUT',
+  headers: { 'Content-Type': 'application/json', ...getAuditHeaders() },
+  body: JSON.stringify({ newCameraIp: trimmedIp }),
+})
       .then(async (response) => {
         if (!response.ok) throw new Error(`Server returned ${response.status}`);
         return response.json();
@@ -185,7 +195,7 @@ function BoxStatus({ refreshTrigger, showActions = false, showStats = true }) {
   const performDeleteCamera = (item, camera, rowKey) => {
     setPendingKey(rowKey);
     const url = `${process.env.REACT_APP_API_BASE_URL}/v1/megbox/camera?megboxIp=${encodeURIComponent(item.megboxIp)}&cameraIp=${encodeURIComponent(camera.cameraIp)}`;
-    fetch(url, { method: 'DELETE' })
+    fetch(url, { method: 'DELETE', headers: getAuditHeaders() })
       .then(async (response) => {
         if (!response.ok) throw new Error(`Server returned ${response.status}`);
         return response.json();
@@ -217,7 +227,7 @@ function BoxStatus({ refreshTrigger, showActions = false, showStats = true }) {
     const pendingBoxKey = `megbox-${item.megboxIp}`;
     setPendingKey(pendingBoxKey);
     const url = `${process.env.REACT_APP_API_BASE_URL}/v1/megbox?megboxIp=${encodeURIComponent(item.megboxIp)}`;
-    fetch(url, { method: 'DELETE' })
+   fetch(url, { method: 'DELETE', headers: getAuditHeaders() })
       .then(async (response) => {
         if (!response.ok) throw new Error(`Server returned ${response.status}`);
         return response.json();

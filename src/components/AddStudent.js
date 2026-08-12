@@ -26,7 +26,7 @@ function AddStudent() {
 
   const fetchStudents = () => {
     setIsLoading(true);
-    fetch('http://localhost:8080/kpcamera/v1/students/getAllStudent')
+    fetch('http://13.201.120.181:8080/kpcamera/v1/students/getAllStudent')
       .then((response) => response.json())
       .then((data) => {
         setStudents(data);
@@ -97,11 +97,11 @@ function AddStudent() {
 
     setIsLoading(true);
 
-    let url = 'http://localhost:8080/kpcamera/v1/students/addStudent';
+    let url = 'http://13.201.120.181:8080/kpcamera/v1/students/addStudent';
     let method = 'POST';
 
     if (isEditing) {
-      url = `http://localhost:8080/kpcamera/v1/students/updateStudent/${isEditing}`;
+      url = `http://13.201.120.181:8080/kpcamera/v1/students/updateStudent/${isEditing}`;
       method = 'PUT';
     }
 
@@ -136,7 +136,7 @@ function AddStudent() {
 
   const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to delete this student?')) {
-      fetch(`http://localhost:8080/kpcamera/v1/students/deleteStudent/${id}`, {
+      fetch(`http://13.201.120.181:8080/kpcamera/v1/students/deleteStudent/${id}`, {
         method: 'DELETE',
       })
         .then(() => {
@@ -176,7 +176,7 @@ function AddStudent() {
 
   const uploadStudentAPI = (studentsData) => {
     setIsLoading(true);
-    fetch('http://localhost:8080/kpcamera/v1/students/uploadExcelsheet', {
+    fetch('http://13.201.120.181:8080/kpcamera/v1/students/uploadExcelsheet', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

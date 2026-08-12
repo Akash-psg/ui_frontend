@@ -11,7 +11,7 @@ function MegboxUpload() {
     setIsLoading(true);
     setLastResult(null);
 
-    fetch(`${process.env.REACT_APP_API_BASE_URL}/v1/v1/attendance/triggerUpload`, {
+    fetch(`http://13.201.120.181:8080/v1/attendance/triggerUpload`, {
       method: 'GET',
     })
       .then(async (response) => {

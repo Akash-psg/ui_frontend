@@ -84,7 +84,7 @@ header.kp-header {
   border-radius: 14px;
   font-family: 'Quicksand', sans-serif;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 14.5px;
   text-align: left;
   padding: 12px 16px;
   letter-spacing: .01em;
@@ -130,16 +130,18 @@ header.kp-header {
   color: #fff;
   font-family: 'Quicksand', sans-serif;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 14.5px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .kp-sidebar-role {
   color: rgba(255,255,255,0.75);
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 600;
+  text-transform: capitalize;
 }
+
 
 @media (max-width: 768px) {
   .kp-sidebar-profile { padding: 12px 6px 16px; gap: 6px; }
@@ -189,12 +191,15 @@ header.kp-header {
 .kp-scope .kp-field label {
   width: auto;
   margin: 0;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--kp-muted);
   font-weight: 600;
   white-space: normal;
 }
+
 .kp-scope input[type="text"],
+.kp-scope input[type="date"],
+.kp-scope input[type="time"],
 .kp-scope select {
   width: 100%;
   max-width: none;
@@ -206,11 +211,37 @@ header.kp-header {
   padding: 11px 14px;
   font-size: 13.5px;
   font-family: 'Inter', sans-serif;
+  box-sizing: border-box;
 }
-.kp-scope input[type="text"]:focus {
+.kp-scope input[type="text"]:focus,
+.kp-scope input[type="date"]:focus,
+.kp-scope input[type="time"]:focus {
   border-color: var(--kp-grad2);
   box-shadow: none;
   outline: none;
+}
+
+/* Style the native calendar/clock picker icons to match the theme
+   instead of the default black browser icon */
+.kp-scope input[type="date"]::-webkit-calendar-picker-indicator,
+.kp-scope input[type="time"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.55;
+  filter: invert(30%) sepia(60%) saturate(1500%) hue-rotate(230deg);
+  padding: 2px;
+  border-radius: 6px;
+}
+.kp-scope input[type="date"]::-webkit-calendar-picker-indicator:hover,
+.kp-scope input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  background: rgba(122, 84, 240, 0.12);
+}
+
+/* Firefox doesn't support ::-webkit-calendar-picker-indicator, but
+   still needs the color/font reset so text isn't left at browser default */
+.kp-scope input[type="date"],
+.kp-scope input[type="time"] {
+  color-scheme: light;
 }
 
 .kp-scope .kp-camera-groups {
@@ -236,8 +267,13 @@ header.kp-header {
 
 @media (max-width: 760px) {
   .kp-scope .kp-camera-row { flex-direction: column; align-items: stretch; }
-  .kp-scope .kp-camera-row .kp-field { max-width: none; }
+  /* Reset flex-basis to auto (content height) — flex: 1 1 220px from the
+     desktop rule was sizing each field's HEIGHT to 220px once the row
+     switched to flex-direction: column, causing large empty gaps between
+     Camera IP / Room No / Room Id on mobile. */
+  .kp-scope .kp-camera-row .kp-field { max-width: none; flex: 0 1 auto; }
 }
+
 
 .kp-scope .kp-icon-link {
   display: inline-flex;
@@ -348,20 +384,36 @@ header.kp-header {
   background-position: 12px center;
 }
 
-.kp-scope .kp-table-wrap table { width: 100%; border-collapse: collapse; margin-top: 0; }
+.kp-scope .kp-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+}
+.kp-scope .kp-table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0;
+  min-width: 480px;
+}
 .kp-scope .kp-table-wrap th {
   text-align: left;
-  font-size: 10.5px;
+  font-size: 12px;
   text-transform: uppercase;
-  letter-spacing: .05em;
-  color: var(--kp-faint);
+  letter-spacing: .04em;
+  color: var(--kp-grad1);
   font-weight: 700;
-  padding: 0 12px 12px;
-  background: transparent;
+  padding: 12px 14px;
+  background: var(--kp-field-bg);
+}
+.kp-scope .kp-table-wrap thead tr:first-child th:first-child {
+  border-top-left-radius: 10px;
+}
+.kp-scope .kp-table-wrap thead tr:first-child th:last-child {
+  border-top-right-radius: 10px;
 }
 .kp-scope .kp-table-wrap td {
-  padding: 12px;
-  font-size: 13px;
+  padding: 13px 14px;
+  font-size: 14.5px;
   border-top: 1px solid #F0EDFA;
   background: transparent;
   font-weight: 500;
@@ -678,4 +730,119 @@ header.kp-header {
 
 @media (max-width: 640px) {
   .kp-result-banner { flex-direction: column; }
+}
+/* ---------- Students list: checkbox multi-select delete ---------- */
+.kp-scope .kp-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--kp-grad2);
+  cursor: pointer;
+  margin: 0;
+}
+
+.kp-scope .kp-search-row--with-action {
+  justify-content: space-between;
+}
+.kp-delete-selected-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.kp-scope .kp-table-wrap tr.kp-row-selected td {
+  background: #F1EDFC;
+}
+
+.kp-scope .kp-table-wrap tbody tr:nth-child(even) td {
+  background: #FAF9FE;
+}
+
+.kp-scope .kp-table-wrap tbody tr:hover td {
+  background: #F1EDFC;
+}
+
+@media (max-width: 640px) {
+  .kp-scope .kp-search-row--with-action {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .kp-delete-selected-btn {
+    justify-content: center;
+  }
+}
+
+ /* ---------- CSV template modal (replaces old always-visible side panel) ---------- */
+.kp-scope .kp-template-modal {
+  max-width: 420px;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+@media (max-width: 480px) {
+  .kp-scope .kp-template-modal {
+    padding: 22px 18px 18px;
+  }
+  .kp-scope .kp-csv-template-table th,
+  .kp-scope .kp-csv-template-table td {
+    padding: 7px 9px;
+    font-size: 11.5px;
+  }
+}
+.kp-scope .kp-template-modal .kp-confirm-title {
+  text-align: center;
+  margin-bottom: 16px;
+}
+.kp-scope .kp-csv-template-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+.kp-scope .kp-csv-template-table {
+  width: 100%;
+  min-width: 260px;
+  border-collapse: collapse;
+  background: var(--kp-field-bg);
+  margin-bottom: 0;
+}
+.kp-scope .kp-csv-template-table th {
+  background-color: #9370DB !important;
+  color: #fff !important;
+  font-size: 10px !important;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  font-weight: 700;
+  padding: 8px 12px;
+  text-align: left;
+}
+.kp-scope .kp-csv-template-table td {
+  font-size: 12.5px;
+  padding: 8px 12px;
+  border-top: 1px solid #E4DEF9;
+  color: var(--kp-ink);
+}
+.kp-scope .kp-csv-template-note {
+  font-size: 11.5px;
+  color: var(--kp-faint);
+  line-height: 1.5;
+  margin: 0 0 4px;
+}
+.kp-scope .kp-csv-template-note code {
+  background: var(--kp-field-bg);
+  color: var(--kp-grad1);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.kp-pagination--centered {
+  justify-content: center;
+  gap: 16px;
+}
+
+.kp-pagination--centered .kp-pagination-info {
+  white-space: nowrap;
 }
