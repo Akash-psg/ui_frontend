@@ -6,6 +6,7 @@ import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import AssignCamera from './components/AssignCamera';
 import BoxStatus from './components/BoxStatus';
+import Master from './components/Master';
 import Registration from './components/Registration';
 import Students from './components/Students';
 import MegboxUpload from './components/MegboxUpload';
@@ -79,6 +80,7 @@ function App() {
         <div className="kp-sidebar-backdrop" onClick={toggleSidebar} />
       )}
       <main className={isSidebarOpen ? '' : 'main-sidebar-closed'}>
+        {activeSection === 'master' && <Master />}
         {activeSection === 'assignCamera' && <AssignCamera />}
         {activeSection === 'boxStatus' && <BoxStatus />}
         {activeSection === 'registration' && <Registration />}

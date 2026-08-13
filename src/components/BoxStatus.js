@@ -71,6 +71,11 @@ const getAuditHeaders = () => {
       .finally(() => setIsLoading(false));
   };
 
+  // The status API returns campusName/blockName directly (can be null if
+  // the megbox was assigned without a matching campus/block).
+  const getCampusName = (item) => item.campusName || '-';
+  const getBlockName = (item) => item.blockName || '-';
+
   const getMegboxColor = (item) => {
     if (item.megboxStatus !== 'REACHABLE') return 'red';
     const hasUnreachableCamera = item.cameras.some((camera) => camera.status !== 'REACHABLE');
@@ -254,6 +259,13 @@ const getAuditHeaders = () => {
       onConfirm: () => performDeleteMegbox(item),
     });
   };
+
+  // Outer table has: chevron, Megbox IP, Camera IP, Campus, Block, Status, (Actions)
+  const outerColSpan = showActions ? 7 : 6;
+  // The nested inner table sits inside a single wide cell that spans
+  // everything after the chevron column.
+  const nestedTdColSpan = showActions ? 6 : 5;
+
   return (
     <div className="box-status-section kp-scope">
       {/* ---- Stat cards (Total / Online / Down) ---- */}
@@ -292,8 +304,8 @@ const getAuditHeaders = () => {
                 <th style={{ width: '40px' }}></th>
                 <th>Megbox IP</th>
                 <th>Camera IP</th>
-                <th>Room No</th>
-                <th>Room Id</th>
+                <th>Campus</th>
+                <th>Block</th>
                 <th>Status</th>
                 {showActions && <th>Actions</th>}
               </tr>
@@ -301,7 +313,7 @@ const getAuditHeaders = () => {
             <tbody>
               {isLoading && (
                 <tr>
-                  <td colSpan={showActions ? 7 : 6}>
+                  <td colSpan={outerColSpan}>
                     <div className="kp-loading-row">
                       <span className="kp-spinner" />
                       Loading MegBox data...
@@ -312,7 +324,7 @@ const getAuditHeaders = () => {
 
               {!isLoading && filteredStatusData.length === 0 && (
                 <tr>
-                  <td colSpan={showActions ? 7 : 6}>No MegBox data found.</td>
+                  <td colSpan={outerColSpan}>No MegBox data found.</td>
                 </tr>
               )}
 
@@ -336,8 +348,8 @@ const getAuditHeaders = () => {
                         <td>
                           {item.cameras.length} camera{item.cameras.length !== 1 ? 's' : ''}
                         </td>
-                        <td></td>
-                        <td></td>
+                        <td>{getCampusName(item)}</td>
+                        <td>{getBlockName(item)}</td>
                         <td>
                           <StatusBadge
                             color={getMegboxColor(item)}
@@ -365,87 +377,104 @@ const getAuditHeaders = () => {
                         )}
                       </tr>
 
-                      {isExpanded &&
-                        item.cameras.map((camera, idx) => {
-                          const rowKey = `${item.megboxIp}-${camera.cameraIp}-${idx}`;
-                          const isEditing = editingRowKey === rowKey;
-                          const isRowPending = pendingKey === rowKey;
-                          return (
-                            <tr key={idx} className="camera-detail-row">
-                              <td></td>
-                              <td></td>
-                              <td>
-                                {isEditing ? (
-                                  <input
-                                    type="text"
-                                    value={editedCameraIp}
-                                    onChange={(e) => setEditedCameraIp(e.target.value)}
-                                    onClick={(e) => e.stopPropagation()}
-                                    disabled={isRowPending}
-                                    className="kp-inline-edit-input"
-                                  />
-                                ) : (
-                                  camera.cameraIp
-                                )}
-                              </td>
-                              <td>{camera.roomNo || '-'}</td>
-                              <td>{camera.roomId || '-'}</td>
-                              <td>
-                                <StatusBadge
-                                  color={getCameraColor(item, camera)}
-                                  label={getCameraColor(item, camera) === 'green' ? 'Up' : 'Down'}
-                                />
-                              </td>
-                              {showActions && (
-                                <td>
-                                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                    {isEditing ? (
-                                      <>
-                                        <button
-                                          type="button"
-                                          onClick={(e) => handleUpdateClick(e, item, camera, rowKey)}
-                                          title="Update Camera IP"
-                                          disabled={isRowPending}
-                                          className="kp-icon-btn kp-icon-btn--success"
-                                        >
-                                          <FaCheck />
-                                        </button>
-                                        <button
-                                          type="button"
-                                          onClick={handleCancelEdit}
-                                          title="Cancel"
-                                          disabled={isRowPending}
-                                          className="kp-icon-btn kp-icon-btn--muted"
-                                        >
-                                          &#10005;
-                                        </button>
-                                      </>
-                                    ) : (
-                                      <button
-                                        type="button"
-                                        onClick={(e) => handleEditClick(e, camera, rowKey)}
-                                        title="Edit Camera IP"
-                                        disabled={isRowPending}
-                                        className="kp-icon-btn kp-icon-btn--accent"
-                                      >
-                                        <FaEdit />
-                                      </button>
-                                    )}
-                                    <button
-                                      type="button"
-                                      onClick={(e) => handleDeleteCamera(e, item, camera, rowKey)}
-                                      title="Delete Camera"
-                                      disabled={isRowPending}
-                                      className="kp-icon-btn kp-icon-btn--danger"
-                                    >
-                                      <FaTrash />
-                                    </button>
-                                  </div>
-                                </td>
-                              )}
-                            </tr>
-                          );
-                        })}
+                      {isExpanded && (
+                        <tr className="camera-detail-row">
+                          <td></td>
+                          <td colSpan={nestedTdColSpan}>
+                            <table className="kp-nested-table">
+                              <thead>
+                                <tr>
+                                  <th>Camera IP</th>
+                                  <th>Room No</th>
+                                  <th>Room Id</th>
+                                  <th>Status</th>
+                                  {showActions && <th>Actions</th>}
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {item.cameras.map((camera, idx) => {
+                                  const rowKey = `${item.megboxIp}-${camera.cameraIp}-${idx}`;
+                                  const isEditing = editingRowKey === rowKey;
+                                  const isRowPending = pendingKey === rowKey;
+                                  return (
+                                    <tr key={idx}>
+                                      <td>
+                                        {isEditing ? (
+                                          <input
+                                            type="text"
+                                            value={editedCameraIp}
+                                            onChange={(e) => setEditedCameraIp(e.target.value)}
+                                            onClick={(e) => e.stopPropagation()}
+                                            disabled={isRowPending}
+                                            className="kp-inline-edit-input"
+                                          />
+                                        ) : (
+                                          camera.cameraIp
+                                        )}
+                                      </td>
+                                      <td>{camera.roomNo || '-'}</td>
+                                      <td>{camera.roomId ?? '-'}</td>
+                                      <td>
+                                        <StatusBadge
+                                          color={getCameraColor(item, camera)}
+                                          label={getCameraColor(item, camera) === 'green' ? 'Up' : 'Down'}
+                                        />
+                                      </td>
+                                      {showActions && (
+                                        <td>
+                                          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                            {isEditing ? (
+                                              <>
+                                                <button
+                                                  type="button"
+                                                  onClick={(e) => handleUpdateClick(e, item, camera, rowKey)}
+                                                  title="Update Camera IP"
+                                                  disabled={isRowPending}
+                                                  className="kp-icon-btn kp-icon-btn--success"
+                                                >
+                                                  <FaCheck />
+                                                </button>
+                                                <button
+                                                  type="button"
+                                                  onClick={handleCancelEdit}
+                                                  title="Cancel"
+                                                  disabled={isRowPending}
+                                                  className="kp-icon-btn kp-icon-btn--muted"
+                                                >
+                                                  &#10005;
+                                                </button>
+                                              </>
+                                            ) : (
+                                              <button
+                                                type="button"
+                                                onClick={(e) => handleEditClick(e, camera, rowKey)}
+                                                title="Edit Camera IP"
+                                                disabled={isRowPending}
+                                                className="kp-icon-btn kp-icon-btn--accent"
+                                              >
+                                                <FaEdit />
+                                              </button>
+                                            )}
+                                            <button
+                                              type="button"
+                                              onClick={(e) => handleDeleteCamera(e, item, camera, rowKey)}
+                                              title="Delete Camera"
+                                              disabled={isRowPending}
+                                              className="kp-icon-btn kp-icon-btn--danger"
+                                            >
+                                              <FaTrash />
+                                            </button>
+                                          </div>
+                                        </td>
+                                      )}
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
+                          </td>
+                        </tr>
+                      )}
                     </React.Fragment>
                   );
                 })}

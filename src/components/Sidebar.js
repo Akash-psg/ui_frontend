@@ -6,6 +6,7 @@ import {
   FaUsers,
   FaCloudUploadAlt,
   FaChartBar,
+  FaBuilding,
 } from 'react-icons/fa';
 import './Dashboard.css';
 
@@ -22,6 +23,12 @@ function Sidebar({ setActiveSection, isOpen, user }) {
     <nav className={`sidebar kp-sidebar ${isOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
       <ul>
         <li>&nbsp;</li>
+        <li>
+          <button onClick={() => setActiveSection('master')}>
+            <FaBuilding className="kp-nav-icon" />
+            Configuration
+          </button>
+        </li>
         <li>
           <button onClick={() => setActiveSection('assignCamera')}>
             <FaVideo className="kp-nav-icon" />

@@ -847,3 +847,62 @@ header.kp-header {
   white-space: nowrap;
 }
 
+/* ---------- Nested camera table (inside expanded MegBox row) ---------- */
+.kp-scope .kp-nested-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--kp-field-bg);
+  border-radius: 14px;
+  overflow: hidden;
+  margin: 4px 0;
+}
+.kp-scope .kp-nested-table th {
+  text-align: left;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--kp-grad2);
+  font-weight: 700;
+  padding: 9px 12px;
+  background: #EFEBFB;
+}
+.kp-scope .kp-nested-table td {
+  padding: 10px 12px;
+  font-size: 13px;
+  border-top: 1px solid #E4DEF9;
+  background: transparent;
+  font-weight: 500;
+  color: var(--kp-ink);
+}
+.kp-scope .kp-nested-table tbody tr:hover td {
+  background: #F1EDFC;
+}
+
+/* ---------- Master screen tables (Campus / Block lists) ---------- */
+.kp-scope .kp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 18px;
+}
+.kp-scope .kp-table th {
+  text-align: left;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--kp-grad1);
+  font-weight: 700;
+  padding: 12px 14px;
+  background: var(--kp-field-bg);
+}
+.kp-scope .kp-table th:first-child { border-top-left-radius: 10px; }
+.kp-scope .kp-table th:last-child { border-top-right-radius: 10px; }
+.kp-scope .kp-table td {
+  padding: 12px 14px;
+  font-size: 13.5px;
+  border-top: 1px solid #F0EDFA;
+  background: transparent;
+  font-weight: 500;
+  color: var(--kp-ink);
+}
+.kp-scope .kp-table tbody tr:nth-child(even) td { background: #FAF9FE; }
+.kp-scope .kp-table tbody tr:hover td { background: #F1EDFC; }
