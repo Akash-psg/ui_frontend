@@ -10,7 +10,7 @@ function Upload() {
     setError(null);  // Reset any previous errors
 
     try {
-      const response = await fetch('http://13.201.120.181:8080/kpcamera/v1/attendance/uploadImages');  // Replace with your actual GET API endpoint
+      const response = await fetch('http://3.110.42.234:8080/kpcamera/v1/attendance/uploadImages');  // Replace with your actual GET API endpoint
       if (response.ok) {
         console.log("Data fetched successfully:");  // Optional: Log the fetched data
       } else {

@@ -352,15 +352,15 @@ const getAuditHeaders = () => {
                         <td>{getBlockName(item)}</td>
                         <td>
                           <StatusBadge
-                            color={getMegboxColor(item)}
-                            label={
-                              getMegboxColor(item) === 'red'
-                                ? 'Down'
-                                : getMegboxColor(item) === 'orange'
-                                ? 'Partial'
-                                : 'Up'
-                            }
-                          />
+  color={getMegboxColor(item)}
+  label={
+    getMegboxColor(item) === 'red'
+      ? 'Offline'
+      : getMegboxColor(item) === 'orange'
+      ? 'Partial'
+      : 'Online'
+  }
+/>
                         </td>
                         {showActions && (
                           <td>
@@ -415,10 +415,10 @@ const getAuditHeaders = () => {
                                       <td>{camera.roomNo || '-'}</td>
                                       <td>{camera.roomId ?? '-'}</td>
                                       <td>
-                                        <StatusBadge
-                                          color={getCameraColor(item, camera)}
-                                          label={getCameraColor(item, camera) === 'green' ? 'Up' : 'Down'}
-                                        />
+                                      <StatusBadge
+  color={getCameraColor(item, camera)}
+  label={getCameraColor(item, camera) === 'green' ? 'onlinenp' : 'Offline'}
+/>
                                       </td>
                                       {showActions && (
                                         <td>

@@ -40,7 +40,7 @@ function Students() {
       search: debouncedSearch,
     });
 
-    fetch(`http://13.201.120.181:8080/v1/registration/students?${params.toString()}`)
+    fetch(`http://3.110.42.234:8080/v1/registration/students?${params.toString()}`)
       .then(async (response) => {
         if (!response.ok) throw new Error(`Server returned ${response.status}`);
         return response.json();
@@ -102,7 +102,7 @@ function Students() {
   const performDelete = (regNos) => {
     setIsDeleting(true);
 
-    fetch(`http://13.201.120.181:8080/v1/registration/students`, {
+    fetch(`http://3.110.42.234:8080/v1/registration/students`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ regNos }),

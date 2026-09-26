@@ -11,7 +11,7 @@ function MegboxUpload() {
     setIsLoading(true);
     setLastResult(null);
 
-    fetch(`http://13.201.120.181:8080/v1/attendance/triggerUpload`, {
+    fetch(`http://3.110.42.234:8080/v1/attendance/triggerUpload`, {
       method: 'GET',
     })
       .then(async (response) => {

@@ -63,7 +63,7 @@ function GenerateReport() {
     try {
       // Make the GET API request with the start and end date as query params
       const response = await fetch(
-        `http://13.201.120.181:8080/kpcamera/v1/report/generateReportDemo?start=${encodeURIComponent(startIST)}&end=${encodeURIComponent(endIST)}`
+        `http://3.110.42.234:8080/kpcamera/v1/report/generateReportDemo?start=${encodeURIComponent(startIST)}&end=${encodeURIComponent(endIST)}`
       );
 
       // Check if the response is ok (status code 200-299)
